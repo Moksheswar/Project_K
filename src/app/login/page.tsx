@@ -1,10 +1,26 @@
 "use client";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../lib/firebase";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth, googleProvider } from "../../lib/firebase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+function getLoginErrorMessage(code: string) {
+  switch (code) {
+    case "auth/user-not-found":
+      return "No account found with this email.";
+    case "auth/wrong-password":
+      return "Incorrect password.";
+    case "auth/invalid-email":
+      return "Invalid email address.";
+    default:
+      return "Login failed. Please try again.";
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,9 +34,22 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard"); // future protected page
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message);
+      setError(getLoginErrorMessage(err.code));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      router.push("/dashboard");
+    } catch {
+      setError("Google sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -45,14 +74,22 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <button
           onClick={handleLogin}
           disabled={loading}
           className="w-full bg-black text-white p-2 disabled:opacity-50"
         >
-          {loading ? "Logging in..." : "Login"}
+          Login
+        </button>
+
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          className="w-full border p-2"
+        >
+          Continue with Google
         </button>
 
         <p className="text-sm text-center">

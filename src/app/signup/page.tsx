@@ -6,6 +6,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+function getSignupErrorMessage(code: string) {
+  switch (code) {
+    case "auth/email-already-in-use":
+      return "This email is already registered. Please login.";
+    case "auth/invalid-email":
+      return "Please enter a valid email address.";
+    case "auth/weak-password":
+      return "Password must be at least 6 characters long.";
+    case "auth/operation-not-allowed":
+      return "Signup is currently disabled. Please contact support.";
+    case "auth/network-request-failed":
+      return "Network error. Please check your internet connection.";
+    default:
+      return "Signup failed. Please try again.";
+  }
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -20,7 +37,7 @@ export default function SignupPage() {
       await createUserWithEmailAndPassword(auth, email, password);
       router.push("/login");
     } catch (err: any) {
-      setError(err.message);
+      setError(getSignupErrorMessage(err.code));
     } finally {
       setLoading(false);
     }
@@ -45,14 +62,14 @@ export default function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <button
           onClick={handleSignup}
           disabled={loading}
           className="w-full bg-black text-white p-2 disabled:opacity-50"
         >
-          {loading ? "Creating..." : "Create Account"}
+          {loading ? "Creating account..." : "Create Account"}
         </button>
 
         <p className="text-sm text-center">
