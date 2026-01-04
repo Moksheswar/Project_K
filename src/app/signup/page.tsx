@@ -1,24 +1,24 @@
 "use client";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard"); // future protected page
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.push("/login");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -29,7 +29,7 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="w-96 space-y-4 border p-6 rounded">
-        <h1 className="text-2xl font-bold">Login</h1>
+        <h1 className="text-2xl font-bold">Sign Up</h1>
 
         <input
           type="email"
@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Password (min 6 chars)"
           className="w-full border p-2"
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -48,17 +48,17 @@ export default function LoginPage() {
         {error && <p className="text-red-500">{error}</p>}
 
         <button
-          onClick={handleLogin}
+          onClick={handleSignup}
           disabled={loading}
           className="w-full bg-black text-white p-2 disabled:opacity-50"
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Creating..." : "Create Account"}
         </button>
 
         <p className="text-sm text-center">
-          Don’t have an account?{" "}
-          <Link href="/signup" className="underline">
-            Sign up
+          Already have an account?{" "}
+          <Link href="/login" className="underline">
+            Login
           </Link>
         </p>
       </div>
