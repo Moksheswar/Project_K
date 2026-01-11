@@ -67,7 +67,7 @@ export default function SignupPage() {
         <button
           onClick={handleSignup}
           disabled={loading}
-          className="w-full bg-black text-white p-2 disabled:opacity-50"
+          className="w-full bg-black text-white p-2 disabled:opacity-50  cursor-pointer hover:bg-white hover:text-black"
         >
           {loading ? "Creating account..." : "Create Account"}
         </button>
